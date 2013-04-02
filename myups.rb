@@ -45,7 +45,9 @@ module MyUpsCal
       cal = Calendar.new
 
       if html = fetch_my_ups_html(username, password)
-        Nokogiri::HTML(html).css('#dp_table_body > tr').each do |tr|
+        rows = Nokogiri::HTML(html).css('#dp_table_body > tr')
+        warn "Found #{rows.size} rows"
+        rows.each do |tr|
           begin
             cal.add_event build_event_from_row(tr)
           rescue Exception => e
