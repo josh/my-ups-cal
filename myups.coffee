@@ -21,16 +21,27 @@ nextLoad = (callback) ->
     callback()
 
 waitForCalendar = (callback) ->
-  el = page.evaluate ->
-    document.getElementById('calendar')? and
-      document.getElementById('dp_table_body')?
+  count = page.evaluate ->
+    document.getElementById('hTableNum').innerHTML
 
-  if el
-    setTimeout callback, 500
+  console.log count
+
+  done = page.evaluate ->
+    if count = document.getElementById('hTableNum')?.textContent
+      if count is "Number of Shipments: 0"
+        true
+      else
+        document.getElementById('dp_table_body')?.children.length > 0
+    else
+      false
+
+
+  if done
+    callback()
   else
     setTimeout ->
       waitForCalendar callback
-    , 100
+    , 10
 
 submitLogin = (callback) ->
   page.evaluate (username, password) ->
