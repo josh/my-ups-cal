@@ -22,10 +22,11 @@ nextLoad = (callback) ->
 
 waitForCalendar = (callback) ->
   el = page.evaluate ->
-    document.getElementById('dp_table_body')?
+    document.getElementById('calendar')? and
+      document.getElementById('dp_table_body')?
 
   if el
-    callback()
+    setTimeout callback, 100
   else
     setTimeout ->
       waitForCalendar callback
