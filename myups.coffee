@@ -37,7 +37,7 @@ waitForCalendar = (callback) ->
 
 
   if done
-    callback()
+    setTimeout callback, 10
   else
     setTimeout ->
       waitForCalendar callback
