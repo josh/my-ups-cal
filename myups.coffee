@@ -26,11 +26,11 @@ waitForCalendar = (callback) ->
       document.getElementById('dp_table_body')?
 
   if el
-    setTimeout callback, 100
+    setTimeout callback, 500
   else
     setTimeout ->
       waitForCalendar callback
-    , 10
+    , 100
 
 submitLogin = (callback) ->
   page.evaluate (username, password) ->
