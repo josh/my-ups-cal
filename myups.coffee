@@ -24,8 +24,6 @@ waitForCalendar = (callback) ->
   count = page.evaluate ->
     document.getElementById('hTableNum').innerHTML
 
-  console.log count
-
   done = page.evaluate ->
     if count = document.getElementById('hTableNum')?.textContent
       if count is "Number of Shipments: 0"
@@ -55,6 +53,11 @@ submitLogin = (callback) ->
 page.open "https://www.ups.com/one-to-one/login?loc=en_US&returnto=https://wwwapps.ups.com/mcdp?loc=en_US", ->
   submitLogin ->
     waitForCalendar ->
-      html = page.evaluate -> document.documentElement.innerHTML
-      console.log html
+      result = page.evaluate ->
+        for tr in document.getElementById('dp_table_body').children
+          for td in tr.children
+            for node in td.childNodes
+              node.textContent
+
+      console.log JSON.stringify(result)
       phantom.exit()

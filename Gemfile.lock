@@ -2,7 +2,6 @@ GEM
   remote: https://rubygems.org/
   specs:
     icalendar (1.3.0)
-    nokogiri (1.5.9)
     rack (1.5.2)
     rack-protection (1.5.0)
       rack
@@ -17,5 +16,4 @@ PLATFORMS
 
 DEPENDENCIES
   icalendar
-  nokogiri
   sinatra
