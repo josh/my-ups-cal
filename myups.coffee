@@ -77,7 +77,7 @@ buildCalendar = (page) ->
   out.push "PRODID:-//UPS My Choice/Delivery Planner"
 
   for row in result
-    out << "BEGIN:VEVENT"
+    out.push "BEGIN:VEVENT"
 
     [month, day, year] = row[0][0].split('/')
     sender = row[2][0]
