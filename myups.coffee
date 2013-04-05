@@ -59,5 +59,27 @@ page.open "https://www.ups.com/one-to-one/login?loc=en_US&returnto=https://wwwap
             for node in td.childNodes
               node.textContent
 
-      console.log JSON.stringify(result)
+      out = []
+      out.push "BEGIN:VCALENDAR"
+      out.push "VERSION:2.0"
+      out.push "PRODID:-//UPS My Choice/Delivery Planner"
+
+      for row in result
+        out << "BEGIN:VEVENT"
+
+        [month, day, year] = row[0][0].split('/')
+        sender = row[2][0]
+        number = row[3][0]
+
+        out.push "DTSTART:#{year}#{month}#{day}"
+        out.push "DTEND:#{year}#{month}#{day}"
+        out.push "SUMMARY:#{sender}"
+        out.push "DESCRIPTION:#{number}"
+        out.push "URL:http://wwwapps.ups.com/WebTracking/processInputRequest?sort_by=status&tracknums_displayed=1&TypeOfInquiryNumber=T&loc=en_us&InquiryNumber1=#{number}&track.x=0&track.y=0"
+        out.push "END:VEVENT"
+
+      out.push "END:VCALENDAR"
+
+      console.log out.join("\n")
+
       phantom.exit()
