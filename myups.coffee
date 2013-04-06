@@ -119,11 +119,14 @@ loadCalendar = (username, password, callback) ->
       callback new Error "Failed to open #{loginUrl}"
 
 
-if system.args.length isnt 3
+username = system.args[1] ? system.env['UPS_USERNAME']
+password = system.args[2] ? system.env['UPS_PASSWORD']
+
+if !username or !password
   console.error 'Usage: myups.coffee <username> <password>'
   phantom.exit()
 
-loadCalendar system.args[1], system.args[2], (err, data) ->
+loadCalendar username, password, (err, data) ->
   if err
     console.error err
     phantom.exit(1)
