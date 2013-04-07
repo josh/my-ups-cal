@@ -1,1 +1,1 @@
-web: phantomjs ups.coffee $PORT
+web: /app/vendor/phantomjs/bin/phantomjs ups.coffee $PORT
