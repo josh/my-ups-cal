@@ -102,6 +102,7 @@ buildCalendar = (page) ->
   out.push "VERSION:2.0"
   out.push "X-WR-CALNAME:UPS"
   out.push "PRODID:-//UPS My Choice//Delivery Planner//EN"
+  out.push "X-APPLE-CALENDAR-COLOR:#872F04"
 
   for row in result
     out.push "BEGIN:VEVENT"
