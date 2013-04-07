@@ -61,6 +61,37 @@ waitForCalendar = (page, callback, retry = 100) ->
       waitForCalendar page, callback, retry - 1
     , 10
 
+
+# Get timezone offset.
+#
+# Returns hour Integer timezone offset.
+getTimezoneOffset = ->
+  -1 * (new Date).getTimezoneOffset() / 60
+
+# Parse String time estimate.
+#
+# str - String " 2:15 PM "
+#
+# Returns String in UTC time.
+parseTime = (str) ->
+  if m = str.match /(\d\d?):(\d\d) (AM|PM)/
+    hour = parseInt m[1]
+    min  = parseInt m[2]
+    hour += 12 if m[3] is 'PM'
+    hour += getTimezoneOffset()
+    "T#{padDoubleDigit(hour)}#{padDoubleDigit(min)}00Z"
+  else
+    ""
+
+# Pad number to two digits.
+#
+# Returns String number.
+padDoubleDigit = (n) ->
+  if n < 10
+    "0#{n}"
+  else
+    "#{n}"
+
 # Build iCalendar
 #
 # page - WebPage instance
@@ -82,11 +113,14 @@ buildCalendar = (page) ->
     out.push "BEGIN:VEVENT"
 
     [month, day, year] = row[0][0].split('/')
+    [start, end] = row[1][0].split('-')
+
+    out.push "DTSTART:#{year}#{month}#{day}#{parseTime(start)}"
+    out.push "DTEND:#{year}#{month}#{day}#{parseTime(end)}"
+
     sender = row[2][0]
     number = row[3][0]
 
-    out.push "DTSTART:#{year}#{month}#{day}"
-    out.push "DTEND:#{year}#{month}#{day}"
     out.push "SUMMARY:#{sender}"
     out.push "DESCRIPTION:#{number}"
     out.push "URL:http://wwwapps.ups.com/WebTracking/processInputRequest?sort_by=status&tracknums_displayed=1&TypeOfInquiryNumber=T&loc=en_us&InquiryNumber1=#{number}&track.x=0&track.y=0"
