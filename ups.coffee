@@ -101,7 +101,7 @@ buildCalendar = (page) ->
   out.push "BEGIN:VCALENDAR"
   out.push "VERSION:2.0"
   out.push "X-WR-CALNAME:UPS"
-  out.push "PRODID:-//UPS My Choice/Delivery Planner"
+  out.push "PRODID:-//UPS My Choice//Delivery Planner//EN"
 
   for row in result
     out.push "BEGIN:VEVENT"
