@@ -67,7 +67,7 @@ waitForCalendar = (page, callback, retry = 100) ->
 #
 # Returns hour Integer timezone offset.
 getTimezoneOffset = ->
-  -7
+  5
 
 # Parse String time estimate.
 #
