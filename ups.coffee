@@ -62,6 +62,13 @@ waitForCalendar = (page, callback, retry = 100) ->
       waitForCalendar page, callback, retry - 1
     , 10
 
+
+# Get timezone offset.
+#
+# Returns hour Integer timezone offset.
+getTimezoneOffset = ->
+  -1 * (new Date).getTimezoneOffset() / 60
+
 # Parse String time estimate.
 #
 # str - String " 2:15 PM "
@@ -72,6 +79,7 @@ parseTime = (str) ->
     hour = parseInt m[1]
     min  = parseInt m[2]
     hour += 12 if m[3] is 'PM'
+    hour += getTimezoneOffset()
     "T#{padDoubleDigit(hour)}#{padDoubleDigit(min)}00Z"
   else
     ""
