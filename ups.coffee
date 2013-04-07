@@ -67,7 +67,7 @@ waitForCalendar = (page, callback, retry = 100) ->
 #
 # Returns hour Integer timezone offset.
 getTimezoneOffset = ->
-  -1 * (new Date).getTimezoneOffset() / 60
+  -7
 
 # Parse String time estimate.
 #
