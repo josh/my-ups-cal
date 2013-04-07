@@ -1,5 +1,6 @@
-webpage = require 'webpage'
-system  = require 'system'
+webpage   = require 'webpage'
+system    = require 'system'
+webserver = require 'webserver'
 
 
 # Main login url that redirects to planner page
@@ -127,6 +128,7 @@ buildCalendar = (page) ->
     out.push "END:VEVENT"
 
   out.push "END:VCALENDAR"
+  out.push ""
   out.join "\n"
 
 # Load calendar from MyUPS.
@@ -152,18 +154,54 @@ loadCalendar = (username, password, callback) ->
     else
       callback new Error "Failed to open #{loginUrl}"
 
+# Start web server.
+#
+# port - Number port
+#
+# Returns nothing.
+startServer = (port) ->
+  server = webserver.create()
 
-username = system.args[1] ? system.env['UPS_USERNAME']
-password = system.args[2] ? system.env['UPS_PASSWORD']
+  server.listen port, (request, response) ->
+    if m = request.url.match(/^\/delivery.ics\?username=(\w+)&password=(\w+)$/)
+      loadCalendar m[1], m[2], (err, data) ->
+        if err
+          response.statusCode = 500
+          console.error err
+        else
+          response.statusCode = 200
+          response.headers = 'Content-Type': "text/calendar"
+          response.write data
+        response.close()
 
-if !username or !password
-  console.error 'Usage: myups.coffee <username> <password>'
-  phantom.exit()
+    else
+      response.statusCode = 401
+      response.close()
 
-loadCalendar username, password, (err, data) ->
-  if err
-    console.error err
-    phantom.exit(1)
-  else
-    console.log data
+# Handle main command line usuage.
+#
+# args - Array command line arguments
+#
+# Returns nothing.
+main = (args) ->
+  username = args[1] ? system.env['UPS_USERNAME']
+  password = args[2] ? system.env['UPS_PASSWORD']
+
+  if !username or !password
+    console.error 'Usage: myups.coffee <username> <password>'
     phantom.exit()
+    return
+
+  loadCalendar username, password, (err, data) ->
+    if err
+      console.error err
+      phantom.exit(1)
+    else
+      console.log data
+      phantom.exit()
+
+
+if port = parseInt system.args[1]
+  startServer port
+else
+  main system.args
