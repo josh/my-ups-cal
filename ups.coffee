@@ -75,7 +75,7 @@ getTimezoneOffset = ->
 #
 # Returns String in UTC time.
 parseTime = (str) ->
-  if m = str.match /(\d\d?):(\d\d) (AM|PM)/
+  if m = str?.match /(\d\d?):(\d\d) (AM|PM)/
     hour = parseInt m[1]
     min  = parseInt m[2]
     hour += 12 if m[3] is 'PM'
