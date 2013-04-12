@@ -115,6 +115,9 @@ buildCalendar = (page) ->
   out.push "CALSCALE:GREGORIAN"
 
   for row in result
+    # Skip theres no shipments
+    break if row isnt 'object'
+
     out.push "BEGIN:VEVENT"
 
     [month, day, year] = row[0][0].split('/')
