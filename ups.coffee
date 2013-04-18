@@ -116,7 +116,7 @@ buildCalendar = (page) ->
 
   for row in result
     # Skip theres no shipments
-    break if row isnt 'object'
+    break if typeof row isnt 'object'
 
     out.push "BEGIN:VEVENT"
 
