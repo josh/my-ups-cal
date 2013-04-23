@@ -115,8 +115,7 @@ buildCalendar = (page) ->
   out.push "CALSCALE:GREGORIAN"
 
   for row in result
-    # Skip theres no shipments
-    break if typeof row isnt 'object'
+    break if row[0][0] is "There are currently no shipments in transit to this home delivery address."
 
     out.push "BEGIN:VEVENT"
 
