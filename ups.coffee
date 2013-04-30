@@ -47,6 +47,8 @@ waitForCalendar = (page, callback, retry = 5000) ->
     return callback new Error "Timed out waiting for calendar: #{html}"
 
   done = page.evaluate ->
+    document.getElementById('showTableViewId')?.click?()
+
     if count = document.getElementById('hTableNum')?.textContent
       if count is "Number of Shipments: 0"
         true
