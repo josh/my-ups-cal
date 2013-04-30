@@ -41,7 +41,7 @@ submitLogin = (page, username, password, callback) ->
 # callback - Function to invoke when ready
 #
 # Returns nothing.
-waitForCalendar = (page, callback, retry = 5000) ->
+waitForCalendar = (page, callback, retry = 500) ->
   if retry < 0
     html = page.evaluate -> document.body.innerHTML
     return callback new Error "Timed out waiting for calendar: #{html}"
