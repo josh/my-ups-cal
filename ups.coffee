@@ -119,11 +119,12 @@ buildCalendar = (page) ->
   for row in result
     break if row[0][0] is "There are currently no shipments in transit to this home delivery address."
 
-    out.push "BEGIN:VEVENT"
-
     [month, day, year] = row[0][0].split('/')
     [start, end] = row[1][0].split('-')
 
+    continue unless month and day and year
+
+    out.push "BEGIN:VEVENT"
     out.push "DTSTART:#{year}#{month}#{day}#{parseTime(start)}"
     out.push "DTEND:#{year}#{month}#{day}#{parseTime(end)}"
 
