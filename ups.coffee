@@ -149,7 +149,6 @@ buildCalendar = (page) ->
 # Returns nothing.
 loadCalendar = (username, password, callback) ->
   page = webpage.create()
-  page.settings.loadImages = false
 
   page.open loginUrl, (status) ->
     if status is 'success'
