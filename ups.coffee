@@ -48,6 +48,7 @@ waitForCalendar = (page, callback, retry = 500) ->
 
   done = page.evaluate ->
     document.getElementById('showTableViewId')?.click?()
+    mcdp?.showTableView?()
 
     if count = document.getElementById('hTableNum')?.textContent
       if count is "Number of Shipments: 0"
