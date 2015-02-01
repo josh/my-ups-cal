@@ -246,7 +246,8 @@
           } else {
             response.statusCode = 200;
             response.headers = {
-              'Content-Type': "text/calendar"
+              'Content-Type': "text/calendar",
+              'Cache-Control': "public, max-age=3600"
             };
             response.write(data);
           }
