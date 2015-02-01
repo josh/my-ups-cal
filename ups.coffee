@@ -28,9 +28,9 @@ nextLoad = (page, callback) ->
 # Returns nothing.
 submitLogin = (page, username, password, callback) ->
   page.evaluate (username, password) ->
-    document.forms.UserID.uid.value = username
-    document.forms.UserID.password.value = password
-    document.forms.UserID.next.click()
+    document.forms.LoginFacebook.uid.value = username
+    document.forms.LoginFacebook.password.value = password
+    document.forms.LoginFacebook.next.click()
   , username, password
   nextLoad page, callback
 
