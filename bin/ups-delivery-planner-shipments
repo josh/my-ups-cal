@@ -1,0 +1,160 @@
+#!/usr/bin/env phantomjs
+
+var system = require('system');
+var webpage = require('webpage');
+
+// Main login url that redirects to planner page
+var loginUrl = "https://www.ups.com/one-to-one/login?loc=en_US&returnto=https://wwwapps.ups.com/mcdp?loc=en_US";
+
+// Invoke function when the next time the page loads.
+//
+// page - WebPage instance
+// callback - Function to invoke when finished
+//
+// Returns nothing.
+function nextLoad(page, callback) {
+  page.onLoadFinished = function(status) {
+    var err;
+    page.onLoadFinished = null;
+    if (status !== 'success') {
+      err = new Error("failed to load next page");
+    }
+    callback(err);
+  };
+}
+
+// Submit MyUPS login form.
+//
+// page     - WebPage instance
+// username - String username
+// password - String password
+// callback - Function to invoke when finished
+//
+// Returns nothing.
+function submitLogin(page, username, password, callback) {
+  page.evaluate(function(username, password) {
+    document.forms.LoginFacebook.uid.value = username;
+    document.forms.LoginFacebook.password.value = password;
+    document.forms.LoginFacebook.next.click();
+  }, username, password);
+  nextLoad(page, callback);
+}
+
+// Poll for delivery planner data to load.
+//
+// page - WebPage instance
+// callback - Function to invoke when ready
+//
+// Returns nothing.
+function waitForPlanner(page, callback, retry) {
+  if (!retry) {
+    retry = 500;
+  }
+
+  if (retry < 0) {
+    var html = page.evaluate(function() {
+      return document.body.innerHTML;
+    });
+    callback(new Error("Timed out waiting for planner: " + html));
+    return;
+  }
+
+  var done = page.evaluate(function() {
+    if (document.getElementById('showTableViewId')) {
+      document.getElementById('showTableViewId').click();
+    }
+
+    if (window.mcdp && window.mcdp.showTableView) {
+      window.mcdp.showTableView();
+    }
+
+    if (document.getElementById('hTableNum')) {
+      if (document.getElementById('hTableNum').textContent.match("Number of Shipments:")) {
+        return true;
+      } else if (document.getElementById('dp_table_body')) {
+        return document.getElementById('dp_table_body').children.length > 0;
+      }
+    }
+
+    return false;
+  });
+
+  if (done) {
+    setTimeout(callback, 10);
+  } else {
+    setTimeout(function() {
+      waitForPlanner(page, callback, retry - 1);
+    }, 10);
+  }
+}
+
+// Extract shipments table.
+//
+// page - WebPage instance
+//
+// Returns Array of shipment data.
+function extractShipments(page) {
+  return page.evaluate(function() {
+    var map = Array.prototype.map;
+    return map.call(document.getElementById('dp_table_body').children, function(tr) {
+      return map.call(tr.children, function(td) {
+        return map.call(td.childNodes, function(node) {
+          return node.textContent;
+        });
+      });
+    });
+  });
+}
+
+// Load shipments from MyUPS.
+//
+// username - String username
+// password - String password
+// callback - Function to invoke when finished
+//
+// Returns nothing.
+function loadShipments(username, password, callback) {
+  var page = webpage.create();
+  page.open(loginUrl, function(status) {
+    if (status === 'success') {
+      submitLogin(page, username, password, function(err) {
+        waitForPlanner(page, function(err) {
+          if (err) {
+            callback(err);
+          } else {
+            try {
+              callback(null, extractShipments(page));
+            } catch (error) {
+              callback(error);
+            }
+          }
+        });
+      });
+    } else {
+      callback(new Error("Failed to open " + loginUrl));
+    }
+  });
+}
+
+function main() {
+  var username = system.args[1];
+  var password = system.args[2];
+
+  if (!username || !password) {
+    system.stderr.write("usage: ups-delivery-planner-shipments <username> <password>\n");
+    phantom.exit(1);
+    return;
+  }
+
+  loadShipments(username, password, function(err, data) {
+    if (err) {
+      system.stderr.write("" + err + "\n");
+      phantom.exit(1);
+    } else {
+      system.stdout.write(JSON.stringify(data) + "\n");
+      phantom.exit();
+    }
+  });
+}
+
+main();

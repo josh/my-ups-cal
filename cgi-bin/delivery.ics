@@ -1,0 +1,33 @@
+#!/bin/bash
+
+set -e
+set -o pipefail
+
+PATH="/app/bin:$PATH"
+
+IFS="&"
+set -- $QUERY_STRING
+qs=($@)
+
+for i in "${qs[@]}"; do
+  IFS="="
+  set -- $i
+  case "$1" in
+    username) USERNAME="$2" ;;
+    password) PASSWORD="$2" ;;
+    *) ;;
+  esac
+done
+
+if [ -z "$USERNAME" ] || [ -z "$PASSWORD" ]; then
+  printf "Status: 401 Unauthorized\r\n"
+  printf "\r\n"
+  exit
+fi
+
+printf "Status: 200 OK\r\n"
+printf "Content-Type: text/calendar\r\n"
+printf "Cache-Control: public, max-age=3600\r\n"
+printf "\r\n"
+
+ups-delivery-planner-shipments "$USERNAME" "$PASSWORD" | fmt-ups-ics

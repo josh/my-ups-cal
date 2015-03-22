@@ -1,0 +1,32 @@
+#!/usr/bin/env ruby
+
+require 'json'
+require 'time'
+
+puts "BEGIN:VCALENDAR"
+puts "VERSION:2.0"
+puts "X-WR-CALNAME:UPS"
+puts "PRODID:-//UPS My Choice//Delivery Planner//EN"
+puts "X-APPLE-CALENDAR-COLOR:#872F04"
+puts "X-WR-TIMEZONE:America/Chicago"
+puts "CALSCALE:GREGORIAN"
+
+JSON.parse(ARGF.read).each do |row|
+  next if row[0][0].to_s =~ /no shipments/
+
+  _, month, day, year = row[0][0].match(/(\d+)\/(\d+)\/(\d+)/).to_a
+  start_time, end_time = row[1][0].split('-', 2)
+
+  start_date = Time.parse("#{year}-#{month}-#{day} #{start_time} -0700").utc
+  end_date = Time.parse("#{year}-#{month}-#{day} #{end_time} -0700").utc
+
+  puts "BEGIN:VEVENT"
+  puts "DTSTART:#{start_date.strftime("%Y%m%dT%H%M%SZ")}"
+  puts "DTEND:#{end_date.strftime("%Y%m%dT%H%M%SZ")}"
+  puts "SUMMARY:#{row[2][0]}"
+  puts "DESCRIPTION:#{row[3][0]}"
+  puts "URL:http://wwwapps.ups.com/WebTracking/processInputRequest?sort_by=status&tracknums_displayed=1&TypeOfInquiryNumber=T&loc=en_us&InquiryNumber1=#{row[3][0]}&track.x=0&track.y=0"
+  puts "END:VEVENT"
+end
+
+puts "END:VCALENDAR"

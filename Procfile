@@ -1,1 +1,1 @@
-web: /app/vendor/phantomjs/bin/phantomjs ups.js $PORT
+web: /app/bin/thttpd -p "$PORT" -d "/app" -l "-" -D
